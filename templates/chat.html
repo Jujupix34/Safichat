@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>SafiChat 💖</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="login">
+        <h2>Digite seu nome para entrar:</h2>
+        <input id="username" placeholder="Ex: Lua, Clara, Sol..." />
+        <button onclick="enterChat()">Entrar</button>
+    </div>
+
+    <div id="chat" style="display:none;">
+        <h1>Bem-vinda ao SafiChat 💬</h1>
+        <ul id="messages"></ul>
+        <input id="msg" autocomplete="off" placeholder="Digite sua mensagem..." />
+        <button onclick="sendMessage()">Enviar</button>
+    </div>
+
+    <script>
+        const socket = io();
+        let username = "";
+
+        function enterChat() {
+            username = document.getElementById('username').value.trim();
+            if (username !== "") {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('chat').style.display = 'block';
+                socket.emit('message', `${username} entrou no chat!`);
+            }
+        }
+
+        socket.on('message', function(msg) {
+            const item = document.createElement('li');
+            item.textContent = msg;
+            messages.appendChild(item);
+        });
+
+        function sendMessage() {
+            const input = document.getElementById('msg');
+            if (input.value.trim() !== "") {
+                socket.emit('message', `${username}: ${input.value}`);
+                input.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
