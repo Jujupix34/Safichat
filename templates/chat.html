@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>SafiChat 💖</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.4/dist/index.min.js"></script>
+</head>
+<body>
+    <div id="login">
+    <h2>Canal: {{ canal }}</h2>
+    <h2>Digite seu nome e escolha um avatar:</h2>
+    <input id="username" placeholder="Ex: Lua, Clara, Sol..." />
+    <select id="avatar">
+        <option value="🌸">🌸 Flor</option>
+        <option value="🦋">🦋 Borboleta</option>
+        <option value="🌈">🌈 Arco-íris</option>
+        <option value="🐱">🐱 Gato</option>
+        <option value="🎨">🎨 Artista</option>
+    </select>
+    <button onclick="enterChat()">Entrar</button>
+</div>
+
+<textarea id="bio" placeholder="Escreva uma bio curta..."></textarea>
+<select id="status">
+    <option value="😊 Feliz">😊 Feliz</option>
+    <option value="😔 Triste">😔 Triste</option>
+    <option value="😡 Irritada">😡 Irritada</option>
+    <option value="😴 Cansada">😴 Cansada</option>
+    <option value="🤔 Pensativa">🤔 Pensativa</option>
+</select>
+
+    <div id="chat" style="display:none;">
+        <h1>Bem-vinda ao SafiChat 💬</h1>
+        <h2>Canal: {{ canal }}</h2>
+        <ul id="messages"></ul>
+        <div class="input-area">
+            <input id="msg" autocomplete="off" placeholder="Digite sua mensagem..." />
+            <button onclick="sendMessage()">Enviar</button>
+            <button id="emoji-button">😊</button>
+        </div>
+    </div>
+ <script>
+    const socket = io();
+    let username = "";
+    let avatar = "";
+
+    // Emoji picker
+    const picker = new EmojiButton();
+    const emojiBtn = document.querySelector('#emoji-button');
+    const input = document.querySelector('#msg');
+
+    emojiBtn.addEventListener('click', () => {
+        picker.togglePicker(emojiBtn);
+    });
+
+    picker.on('emoji', emoji => {
+        input.value += emoji;
+    });
+
+    function enterChat() {
+    username = document.getElementById('username').value.trim();
+    avatar = document.getElementById('avatar').value;
+    const bio = document.getElementById('bio').value.trim();
+    const status = document.getElementById('status').value;
+
+    if (username !== "") {
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('chat').style.display = 'block';
+
+        socket.emit('message', `${avatar} ${username} entrou no chat!`);
+        socket.emit('perfil', { nome: username, avatar, canal: "{{ canal }}", bio, status });
+    }
+}
+
+
+    // Enviar mensagem
+    function sendMessage() {
+        const input = document.getElementById('msg');
+        avatar = document.getElementById('avatar').value; // ← garante que o avatar seja atualizado
+        if (input.value.trim() !== "") {
+            socket.emit('message', `${avatar} ${username}: ${input.value}`);
+            input.value = '';
+        }
+    }
+
+    // Receber mensagens
+    socket.on('message', function(msg) {
+        const item = document.createElement('li');
+        item.innerHTML = `
+            <div class="msg-box">
+                <span>${msg}</span>
+                <button class="reply-btn" onclick="replyTo('${escapeQuotes(msg)}')">↪ Responder</button>
+            </div>
+        `;
+        document.getElementById('messages').appendChild(item);
+    });
+
+    // Função para responder
+    function replyTo(message) {
+        const input = document.getElementById('msg');
+        const name = message.split(':')[0];
+        input.value = `@${name} `;
+        input.focus();
+    }
+
+    // Evita erro com aspas em mensagens
+    function escapeQuotes(text) {
+        return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfis do SafiChat 💖</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>🌟 Perfis registrados no SafiChat</h1>
+    <ul class="perfil-lista">
+    {% for p in perfis %}
+        <li>
+            <span class="avatar">{{ p.avatar }}</span>
+            <strong>{{ p.nome }}</strong> — Canal: <em>{{ p.canal }}</em><br>
+            <small>Bio: {{ p.bio or "—" }}</small><br>
+            <small>Status: {{ p.status or "—" }}</small>
+        </li>
+    {% endfor %}
+</ul>
+
+    <a href="/">⬅ Voltar para a página inicial</a>
+</body>
+</html>
