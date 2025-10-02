@@ -143,8 +143,11 @@ body {
   backdrop-filter: blur(10px);
   box-shadow: 0 0 20px rgba(0,0,0,0.3);
   text-align: center;
-  width: 300px;
+  width: 90%;
+  max-width: 320px;
+  margin: auto;
 }
+
 
 input {
   width: 100%;

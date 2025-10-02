@@ -168,7 +168,7 @@ def handle_message(msg):
 
         existente = Perfil.query.filter_by(nome=nome, canal=canal).first()
         if not existente:
-            novo = Perfil(nome=nome, avatar=avatar, canal=canal, senha="")  
+            novo = Perfil(nome=nome, avatar=avatar, canal=canal, senha="senha_padrao")
             db.session.add(novo)
             db.session.commit()
 
