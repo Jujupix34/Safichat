@@ -113,3 +113,27 @@ body.dark {
 button {
   margin: 5px;
 }
+
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(-45deg,
+    #D60270, 
+    #FF9A56,  
+    #FFD800,  
+    #9B4F96,  
+    #21B1FF,  
+    #D362A4,  
+    #0038A8   
+  );
+  background-size: 600% 600%;
+  animation: gradientBG 20s ease infinite;
+  color: white;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
