@@ -1,15 +1,9 @@
-<<<<<<< HEAD
 services:
   - type: web
     name: safichat
     env: python
     buildCommand: ""
     startCommand: python app.py
-=======
-services:
-  - type: web
-    name: safichat
-    env: python
-    buildCommand: ""
-    startCommand: python app.py
->>>>>>> 85a782ef63438893a372f4a8db12ed9ada4302fb
+    envVars:
+      - key: FLASK_ENV
+        value: production

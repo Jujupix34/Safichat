@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head><title>Painel SafiChat</title></head>
+<body>
+  <h2>👥 Perfis cadastrados</h2>
+  <p>Total: {{ perfis|length }}</p>
+
+  <form method="GET" action="{{ url_for('painel') }}">
+    <label>Filtrar por canal:</label>
+    <select name="canal">
+      <option value="">Todos</option>
+      {% for c in canais %}
+        <option value="{{ c.canal }}" {% if canal_selecionado == c.canal %}selected{% endif %}>{{ c.canal }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Filtrar</button>
+  </form>
+
+  <table border="1">
+    <tr>
+      <th>Nome</th>
+      <th>Avatar</th>
+      <th>Canal</th>
+      <th>Status</th>
+      <th>Bio</th>
+      <th>Ações</th>
+    </tr>
+    {% for p in perfis %}
+    <tr>
+      <td>{{ p.nome }}</td>
+      <td>{{ p.avatar }}</td>
+      <td>{{ p.canal }}</td>
+      <td>{{ p.status }}</td>
+      <td>{{ p.bio }}</td>
+      <td><a href="{{ url_for('excluir', id=p.id) }}">🗑️ Excluir</a></td>
+    </tr>
+    {% endfor %}
+
+    <th>Foto</th>
+...
+<td>
+  {% if p.foto %}
+    <img src="{{ p.foto }}" alt="Foto" width="50">
+  {% else %}
+    Sem foto
+  {% endif %}
+</td>
+
+  </table>
+
+  <br>
+  <a href="{{ url_for('logout_admin') }}">🚪 Sair do painel</a>
+</body>
+</html>

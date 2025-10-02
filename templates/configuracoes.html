@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Configurações do Perfil</title>
+  <style>
+    body.dark {
+      background-color: #121212;
+      color: #f0f0f0;
+    }
+    img {
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    button {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>⚙️ Suas configurações</h2>
+
+  {% if perfil %}
+    <p><strong>Nome:</strong> {{ perfil.nome }}</p>
+    <p><strong>Avatar:</strong> {{ perfil.avatar }}</p>
+
+    <form method="POST" enctype="multipart/form-data">
+      <label>Bio:</label><br>
+      <textarea name="bio">{{ perfil.bio }}</textarea><br><br>
+
+      <label>Status:</label><br>
+      <select name="status">
+        <option value="😊 Feliz" {% if perfil.status == "😊 Feliz" %}selected{% endif %}>😊 Feliz</option>
+        <option value="😔 Triste" {% if perfil.status == "😔 Triste" %}selected{% endif %}>😔 Triste</option>
+        <option value="😡 Irritada" {% if perfil.status == "😡 Irritada" %}selected{% endif %}>😡 Irritada</option>
+        <option value="😴 Cansada" {% if perfil.status == "😴 Cansada" %}selected{% endif %}>😴 Cansada</option>
+        <option value="🤔 Pensativa" {% if perfil.status == "🤔 Pensativa" %}selected{% endif %}>🤔 Pensativa</option>
+      </select><br><br>
+
+      <label>Foto de perfil (upload):</label><br>
+      <input type="file" name="foto"><br><br>
+
+      {% if perfil.foto %}
+        <img src="{{ perfil.foto }}" alt="Sua foto" width="120"><br><br>
+      {% endif %}
+
+      <button type="submit" name="acao" value="atualizar">💾 Atualizar</button>
+      <button type="submit" name="acao" value="excluir" onclick="return confirm('Tem certeza que deseja excluir seu perfil?')">🗑️ Excluir perfil</button>
+      <button type="button" onclick="toggleDark()">🌙 Modo Escuro</button>
+    </form>
+
+    {% if perfil.status %}
+      <p>🔔 Seu status atual é: <strong>{{ perfil.status }}</strong></p>
+    {% endif %}
+  {% else %}
+    <p>Perfil não encontrado.</p>
+  {% endif %}
+
+  <br>
+  <a href="{{ url_for('canal', nome='geral') }}">⬅️ Voltar ao chat</a>
+
+  <script>
+    function toggleDark() {
+      document.body.classList.toggle("dark");
+    }
+  </script>
+</body>
+</html>
