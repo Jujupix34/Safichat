@@ -2,27 +2,24 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from flask_socketio import SocketIO, send
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
 
-PASSWORD = os.environ.get("CHAT_PASSWORD")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 
-
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # 2MB
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///safichat.db'
 db = SQLAlchemy(app)
 socketio = SocketIO(app)
-
 
 class Perfil(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -32,7 +29,7 @@ class Perfil(db.Model):
     bio = db.Column(db.String(200), nullable=True)
     status = db.Column(db.String(50), nullable=True)
     foto = db.Column(db.String(200), nullable=True)
-
+    senha = db.Column(db.String(200), nullable=False)
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
@@ -74,18 +71,46 @@ def excluir(id):
         db.session.commit()
     return redirect(url_for("painel"))
 
-# Rotas de usuário
+@app.route("/cadastro", methods=["GET", "POST"])
+def cadastro():
+    if request.method == "POST":
+        nome = request.form.get("nome")
+        senha = request.form.get("senha")
+        canal = "geral"
+
+        if not nome or not senha:
+            erro = "Preencha todos os campos."
+            return render_template("cadastro.html", erro=erro)
+
+        existente = Perfil.query.filter_by(nome=nome, canal=canal).first()
+        if existente:
+            erro = "Nome já está em uso."
+            return render_template("cadastro.html", erro=erro)
+
+        senha_hash = generate_password_hash(senha)
+        novo = Perfil(nome=nome, avatar="🙂", canal=canal, senha=senha_hash)
+        db.session.add(novo)
+        db.session.commit()
+
+        session["autenticado"] = True
+        session["usuario"] = nome
+        return redirect(url_for("canal", nome="geral"))
+
+    return render_template("cadastro.html")
+
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        senha = request.form.get("senha")
         nome = request.form.get("nome")
-        if senha == PASSWORD and nome:
+        senha = request.form.get("senha")
+
+        perfil = Perfil.query.filter_by(nome=nome, canal="geral").first()
+        if perfil and check_password_hash(perfil.senha, senha):
             session["autenticado"] = True
             session["usuario"] = nome
             return redirect(url_for("canal", nome="geral"))
         else:
-            erro = "Senha incorreta ou nome vazio."
+            erro = "Nome ou senha incorretos."
             return render_template("login.html", erro=erro)
     return render_template("login.html")
 
@@ -132,7 +157,6 @@ def configuracoes():
 
     return render_template("configuracoes.html", perfil=perfil)
 
-
 @socketio.on('message')
 def handle_message(msg):
     print(f'Mensagem recebida: {msg}')
@@ -144,7 +168,7 @@ def handle_message(msg):
 
         existente = Perfil.query.filter_by(nome=nome, canal=canal).first()
         if not existente:
-            novo = Perfil(nome=nome, avatar=avatar, canal=canal)
+            novo = Perfil(nome=nome, avatar=avatar, canal=canal, senha="")  
             db.session.add(novo)
             db.session.commit()
 
@@ -160,11 +184,11 @@ def salvar_perfil(data):
             canal=data['canal'],
             bio=data['bio'],
             status=data['status'],
-            foto=data['foto']
+            foto=data['foto'],
+            senha=""  
         )
         db.session.add(novo)
         db.session.commit()
-
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))

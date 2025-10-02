@@ -1,19 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
+  <meta charset="UTF-8">
   <title>Entrar no SafiChat</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <h2>🌸 Bem-vindo ao SafiChat!</h2>
-  {% if erro %}
-    <p style="color:red;">{{ erro }}</p>
-  {% endif %}
-  <form method="POST">
-    <label>Seu nome:</label><br>
-    <input type="text" name="nome" required><br><br>
-    <label>Senha de acesso:</label><br>
-    <input type="password" name="senha" required><br><br>
-    <button type="submit">Entrar</button>
-  </form>
+  <div class="container">
+    <h2>🌈 Entrar no SafiChat</h2>
+
+    {% if erro %}
+      <p class="erro">{{ erro }}</p>
+    {% endif %}
+
+    <form method="POST">
+      <input type="text" name="nome" placeholder="Seu nome" required>
+      <input type="password" name="senha" placeholder="Sua senha" required>
+      <button type="submit">🔓 Entrar</button>
+    </form>
+
+    <p class="link">Ainda não tem conta? <a href="{{ url_for('cadastro') }}">Criar agora</a></p>
+  </div>
 </body>
 </html>

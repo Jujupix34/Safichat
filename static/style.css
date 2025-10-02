@@ -116,19 +116,18 @@ button {
 
 body {
   margin: 0;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(-45deg,
-    #D60270, 
-    #FF9A56,  
-    #FFD800,  
-    #9B4F96,  
-    #21B1FF,  
-    #D362A4,  
-    #0038A8   
+    #D60270, #FF9A56, #FFD800,
+    #9B4F96, #21B1FF, #D362A4, #0038A8
   );
   background-size: 600% 600%;
   animation: gradientBG 20s ease infinite;
   color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 @keyframes gradientBG {
@@ -136,4 +135,51 @@ body {
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
+.container {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  text-align: center;
+  width: 300px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 8px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #ffffff;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: #ffd800;
+  color: #000;
+}
+
+.erro {
+  color: #ffcccc;
+  background-color: #660000;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.link {
+  margin-top: 15px;
+}
+
 
