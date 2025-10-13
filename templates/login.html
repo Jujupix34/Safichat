@@ -1,27 +1,82 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Entrar no SafiChat</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safichat - Fazer Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Gradiente inspirado na bandeira Bissexual: magenta, roxo, azul */
+            background: linear-gradient(135deg, #A20067 0%, #B84E99 50%, #0038A8 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .form-card {
+            max-width: 400px;
+            width: 90%;
+            background-color: rgba(17, 24, 39, 0.95); /* Gray-900 semi-transparente */
+            backdrop-filter: blur(5px);
+        }
+        .button-bi {
+            background-color: #A20067;
+            background-image: linear-gradient(to right, #A20067, #0038A8);
+        }
+        .button-bi:hover {
+            background-image: linear-gradient(to right, #C6007F, #0050C8);
+        }
+    </style>
 </head>
-<body>
-  <div class="container">
-    <h2>🌈 Entrar no SafiChat</h2>
+<body class="p-4">
 
-    {% if erro %}
-      <p class="erro">{{ erro }}</p>
-    {% endif %}
+    <div class="form-card p-8 md:p-10 rounded-xl shadow-2xl border-t-4 border-[#B84E99]">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-white">Safichat</h1>
+            <p class="text-gray-300 mt-2">A comunidade de chat ao vivo que você procurava.</p>
+        </header>
 
-    <form method="POST">
-      <input type="text" name="nome" placeholder="Seu nome" required>
-      <input type="password" name="senha" placeholder="Sua senha" required>
-      <button type="submit">🔓 Entrar</button>
-    </form>
+        <!-- Mensagem de Erro (se houver) -->
+        {% if erro %}
+            <div class="bg-red-500 text-white p-3 rounded-lg mb-4 text-sm text-center">
+                {{ erro }}
+            </div>
+        {% endif %}
 
-    <p class="link">Ainda não tem conta? <a href="{{ url_for('cadastro') }}">Criar agora</a></p>
-  </div>
+        <!-- Formulário de Login -->
+        <form action="{{ url_for('login') }}" method="POST" class="space-y-4">
+            <h2 class="text-2xl font-semibold text-white">Fazer Login</h2>
+            <div>
+                <label for="nome_login" class="block text-sm font-medium text-gray-300 mb-1">Nome de Usuário</label>
+                <input type="text" id="nome_login" name="nome" required
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#A20067] focus:border-[#A20067] transition duration-150">
+            </div>
+            <div>
+                <label for="senha_login" class="block text-sm font-medium text-gray-300 mb-1">Senha</label>
+                <input type="password" id="senha_login" name="senha" required
+                       class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-[#0038A8] focus:border-[#0038A8] transition duration-150">
+            </div>
+            
+            <button type="submit"
+                    class="w-full button-bi text-white font-bold py-3 rounded-lg shadow-md transition duration-150 ease-in-out">
+                Entrar no Chat
+            </button>
+        </form>
+
+        <div class="mt-6 pt-4 border-t border-gray-700 text-center">
+            <p class="text-gray-300 text-sm">Ainda não tem conta?</p>
+            <a href="{{ url_for('cadastro') }}" 
+               class="text-indigo-400 hover:text-indigo-300 font-semibold transition duration-150 mt-1 inline-block">
+                Crie seu perfil aqui!
+            </a>
+            <div class="mt-4">
+                <a href="{{ url_for('admin') }}" class="text-xs text-gray-500 hover:text-gray-400 transition duration-150">Acesso Administrador</a>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

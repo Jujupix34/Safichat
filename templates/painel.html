@@ -1,54 +1,168 @@
 <!DOCTYPE html>
-<html>
-<head><title>Painel SafiChat</title></head>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safichat - Painel Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1f2937; 
+        }
+        .admin-sidebar {
+            background-color: #111827; 
+            min-height: 100vh;
+        }
+        
+        .active-tab {
+            background-color: #374151; 
+            border-left-color: #EC4899; 
+        }
+    </style>
+</head>
 <body>
-  <h2>👥 Perfis cadastrados</h2>
-  <p>Total: {{ perfis|length }}</p>
 
-  <form method="GET" action="{{ url_for('painel') }}">
-    <label>Filtrar por canal:</label>
-    <select name="canal">
-      <option value="">Todos</option>
-      {% for c in canais %}
-        <option value="{{ c.canal }}" {% if canal_selecionado == c.canal %}selected{% endif %}>{{ c.canal }}</option>
-      {% endfor %}
-    </select>
-    <button type="submit">Filtrar</button>
-  </form>
+    <div class="flex">
+      
+        <aside class="admin-sidebar w-64 p-6 hidden md:block">
+            <h2 class="text-3xl font-bold text-pink-500 mb-8">Admin Safichat</h2>
+            <nav class="space-y-2">
+                <a href="#perfis" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition duration-150 active-tab" onclick="showTab('perfis')">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2a3 3 0 00-5.356-1.857M17 20v-2a3 3 0 00-5.356-1.857"></path></svg>
+                    Gerenciar Perfis
+                </a>
+                <a href="#denuncias" class="flex items-center p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition duration-150" onclick="showTab('denuncias')">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.332 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    Denúncias (Simuladas)
+                </a>
+            </nav>
+            
+            <div class="mt-12">
+                <a href="{{ url_for('logout_admin') }}" class="flex items-center p-3 rounded-lg text-red-400 hover:bg-gray-700 transition duration-150">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3v-4a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    Sair
+                </a>
+            </div>
+        </aside>
 
-  <table border="1">
-    <tr>
-      <th>Nome</th>
-      <th>Avatar</th>
-      <th>Canal</th>
-      <th>Status</th>
-      <th>Bio</th>
-      <th>Ações</th>
-    </tr>
-    {% for p in perfis %}
-    <tr>
-      <td>{{ p.nome }}</td>
-      <td>{{ p.avatar }}</td>
-      <td>{{ p.canal }}</td>
-      <td>{{ p.status }}</td>
-      <td>{{ p.bio }}</td>
-      <td><a href="{{ url_for('excluir', id=p.id) }}">🗑️ Excluir</a></td>
-    </tr>
-    {% endfor %}
+      
+        <main class="flex-1 p-4 md:p-8">
+            <h1 class="text-4xl font-extrabold text-white mb-8">Dashboard Administrativo</h1>
+            
+          
+            <section id="tab-perfis" class="tab-content">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                    <h2 class="text-2xl font-semibold text-white mb-4 sm:mb-0">Usuárias Cadastradas ({{ perfis|length }})</h2>
+                    
+                    
+                    <form method="GET" action="{{ url_for('painel') }}" class="flex items-center space-x-2">
+                        <label for="canal-filter" class="text-gray-300 text-sm hidden sm:block">Filtrar Canal:</label>
+                        <select id="canal-filter" name="canal" onchange="this.form.submit()" 
+                                class="p-2 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm focus:ring-pink-500 focus:border-pink-500 transition duration-150">
+                            <option value="">Todos os Canais</option>
+                            {% for canal in canais %}
+                                <option value="{{ canal[0] }}" {% if canal[0] == canal_selecionado %}selected{% endif %}>
+                                    {{ canal[0]|capitalize }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </div>
 
-    <th>Foto</th>
-...
-<td>
-  {% if p.foto %}
-    <img src="{{ p.foto }}" alt="Foto" width="50">
-  {% else %}
-    Sem foto
-  {% endif %}
-</td>
+                
+                <div class="bg-gray-800 rounded-xl shadow-lg overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-700">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nome</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Canal</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Bio/Status</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            {% for perfil in perfis %}
+                            <tr class="hover:bg-gray-700 transition duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-400">{{ perfil.id }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+                                    <div class="flex items-center">
+                                        <span class="w-6 h-6 mr-2 bg-indigo-500 rounded-full flex items-center justify-center text-xs text-white">{{ perfil.avatar }}</span>
+                                        {{ perfil.nome }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{{ perfil.canal|capitalize }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-400 max-w-xs truncate">{{ perfil.bio or 'Sem bio' }} <span class="text-green-400">({{ perfil.status or 'Offline' }})</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <!-- Botão de Exclusão -->
+                                    <a href="{{ url_for('excluir', id=perfil.id) }}" 
+                                       onclick="return confirm('Tem certeza que deseja excluir {{ perfil.nome }}? Esta ação é permanente.')"
+                                       class="text-red-500 hover:text-red-600 transition duration-150">
+                                        Excluir
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
-  </table>
+      
+            <section id="tab-denuncias" class="tab-content hidden">
+                <h2 class="text-2xl font-semibold text-white mb-6">Central de Denúncias</h2>
+                
+                <div class="bg-gray-800 p-6 rounded-xl shadow-lg">
+                    <p class="text-gray-300 mb-4">
+                        Aqui você gerencia todas as denúncias enviadas pelas usuárias.
+                        <span class="text-pink-400 font-semibold">IMPORTANTE:</span> A lógica para <span class="text-yellow-400">registrar e armazenar denúncias no banco de dados</span> ainda precisa ser implementada no seu código Python.
+                    </p>
+                    
+            
+                    <div class="border border-red-700 p-4 rounded-lg bg-gray-900 mb-4">
+                        <p class="text-red-400 font-bold mb-2">DENÚNCIA SIMULADA #456 - URGENTE</p>
+                        <p class="text-sm text-gray-400">Usuária reportada: <span class="text-white">@JoanaTeste</span></p>
+                        <p class="text-sm text-gray-400">Motivo: Discurso de ódio no Chat Geral.</p>
+                        <div class="mt-3 flex space-x-2">
+                             <button class="px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded transition">Resolver/Arquivar</button>
+                             <button class="px-3 py-1 text-sm bg-red-600 hover:bg-red-700 text-white rounded transition">Suspender Usuária</button>
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-500 text-sm mt-4">Nenhuma denúncia ativa no momento (em tempo real).</p>
+                </div>
+            </section>
 
-  <br>
-  <a href="{{ url_for('logout_admin') }}">🚪 Sair do painel</a>
+        </main>
+    </div>
+
+    <script>
+        
+        function showTab(tabId) {
+      
+            document.querySelectorAll('aside a').forEach(link => {
+                link.classList.remove('active-tab');
+            });
+
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+    
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const linkElement = document.querySelector(`aside a[href="#${tabId}"]`);
+            if (linkElement) {
+                linkElement.classList.add('active-tab');
+            }
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            showTab('perfis'); 
+        });
+    </script>
+
 </body>
 </html>

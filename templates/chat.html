@@ -1,103 +1,276 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>SafiChat 💖</title>
-  <link rel="stylesheet" href="/static/style.css">
-  <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.4/dist/index.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ canal_nome }} - Safichat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #1f2937; }
+      
+        #messages { max-height: calc(100vh - 160px); } 
+        .bg-chat-header { background-color: #111827; }
+        .bg-chat-input { background-color: #374151; }
+        .text-system { color: #84cc16; }
+        .sidebar-link.active { border-left: 4px solid #EC4899; background-color: #374151; }
+    </style>
 </head>
 <body>
-  <h1>🌼 Olá {{ session['usuario'] }}! Bem-vindo ao canal {{ canal }}!</h1>
-  <p>Converse com outros usuários e compartilhe boas energias ✨</p>
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside class="w-20 md:w-64 bg-gray-900 flex flex-col p-2 md:p-4 shadow-xl">
+            <h2 class="text-xl md:text-2xl font-bold text-pink-500 mb-6 hidden md:block">Canais</h2>
+            <nav class="space-y-1">
+                {% for canal in canais %}
+            
+                <a href="{{ url_for('canal', nome_canal=canal) }}"
+                   class="sidebar-link flex items-center p-2 md:p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition duration-150 
+                          {% if canal == canal_nome or ('DM' not in canal_nome and canal == room_id) %} active {% endif %}">
+                    <span class="text-xl mr-0 md:mr-3">
+                        {% if canal == 'sapamovies' %} 🎬
+                        {% elif canal == 'desabafo' %} 📢
+                        {% elif canal == 'poesias' %} 📜
+                        {% elif canal == 'amor' %} ❤️
+                        {% elif canal == 'amizade' %} 🤝
+                        {% elif canal == 'jogos' %} 🎮
+                        {% elif canal == 'musica' %} 🎵
+                        {% else %} 💬
+                        {% endif %}
+                    </span>
+                    <span class="hidden md:inline capitalize">{{ canal }}</span>
+                </a>
+                {% endfor %}
+            </nav>
+            <div class="mt-auto pt-4 border-t border-gray-700">
+                <a href="{{ url_for('mostrar_perfis') }}" class="flex items-center p-2 md:p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition duration-150">
+                    <span class="text-xl mr-0 md:mr-3">👤</span>
+                    <span class="hidden md:inline">Perfis</span>
+                </a>
+                <a href="{{ url_for('configuracoes') }}" class="flex items-center p-2 md:p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition duration-150">
+                    <span class="text-xl mr-0 md:mr-3">⚙️</span>
+                    <span class="hidden md:inline">Config.</span>
+                </a>
+            </div>
+        </aside>
 
-  <div id="perfil">
-    <h2>Seu avatar:</h2>
-    <select id="avatar">
-      <option value="🌸">🌸 Flor</option>
-      <option value="🦋">🦋 Borboleta</option>
-      <option value="🌈">🌈 Arco-íris</option>
-      <option value="🐱">🐱 Gato</option>
-      <option value="🎨">🎨 Artista</option>
-    </select>
+      
+        <main class="flex-1 flex flex-col">
+            
+          
+            <header class="bg-chat-header p-4 shadow-md flex justify-between items-center border-b border-gray-700">
+                <h1 class="text-2xl font-semibold text-white">{{ canal_nome|capitalize }}</h1>
+                <div class="space-x-3 flex items-center">
+                    <span id="voice-status" class="text-sm text-gray-400">Voz: Desconectada</span>
+                    <button id="join-voice" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-full text-sm font-semibold transition duration-150 shadow-md">
+                        Entrar na Chamada
+                    </button>
+                    <button id="leave-voice" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-sm font-semibold transition duration-150 shadow-md hidden">
+                        Sair da Chamada
+                    </button>
+                </div>
+            </header>
 
-    <textarea id="bio" placeholder="Escreva uma bio curta..."></textarea>
-    <select id="status">
-      <option value="😊 Feliz">😊 Feliz</option>
-      <option value="😔 Triste">😔 Triste</option>
-      <option value="😡 Irritada">😡 Irritada</option>
-      <option value="😴 Cansada">😴 Cansada</option>
-      <option value="🤔 Pensativa">🤔 Pensativa</option>
-    </select>
-    <button onclick="enviarPerfil()">Atualizar perfil</button>
-  </div>
+            
+            <section id="messages" class="flex-1 overflow-y-auto p-4 space-y-4">
+                
+            </section>
 
-  <div id="chat">
-    <h2>💬 Canal: {{ canal }}</h2>
-    <ul id="messages"></ul>
-    <div class="input-area">
-      <input id="msg" autocomplete="off" placeholder="Digite sua mensagem..." />
-      <button onclick="sendMessage()">Enviar</button>
-      <button id="emoji-button">😊</button>
+            <!-- Input de Mensagem -->
+            <footer class="p-4 border-t border-gray-700 bg-chat-header">
+                <form id="send-form" class="flex space-x-3">
+                    <input type="text" id="message-input" placeholder="Digite sua mensagem..." required 
+                           class="flex-1 p-3 rounded-xl bg-chat-input text-white border-none focus:ring-pink-500 focus:border-pink-500 transition duration-150">
+                    <button type="submit" 
+                            class="px-6 py-3 bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-xl transition duration-150 transform hover:scale-105 shadow-lg">
+                        Enviar
+                    </button>
+                </form>
+            </footer>
+
+        </main>
     </div>
-  </div>
 
-  <script>
-    const socket = io();
-    const input = document.getElementById('msg');
-    const emojiBtn = document.querySelector('#emoji-button');
-    const picker = new EmojiButton();
+    <script>
+        const socket = io();
+        const room_id = "{{ room_id }}";
+        const username = "{{ session['usuario'] }}";
+        const userAvatar = "{{ usuario_avatar }}";
+        const messagesContainer = document.getElementById('messages');
+        const voiceStatus = document.getElementById('voice-status');
+        const joinVoiceBtn = document.getElementById('join-voice');
+        const leaveVoiceBtn = document.getElementById('leave-voice');
 
-    emojiBtn.addEventListener('click', () => {
-      picker.togglePicker(emojiBtn);
-    });
+        
+        let localStream = null;
+        let peerConnection = null;
+        const configuration = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] }; 
 
-    picker.on('emoji', emoji => {
-      input.value += emoji;
-    });
+        
+        function displayMessage(data) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('flex', 'items-start', 'space-x-3');
+            
+            if (data.type === 'system') {
+                
+                msgDiv.innerHTML = `<span class="text-xl">🤖</span><p class="text-sm text-system italic">${data.msg}</p>`;
+            } else {
+                
+                const isMe = data.username === username;
+                const textColor = isMe ? 'text-blue-400' : 'text-pink-400';
+                
+                msgDiv.innerHTML = `
+                    <span class="text-xl">${userAvatar}</span>
+                    <p class="text-sm text-gray-200">
+                        <span class="${textColor} font-bold mr-1">${data.username}</span>
+                        ${data.msg}
+                    </p>
+                `;
+            }
 
-    function enviarPerfil() {
-      const avatar = document.getElementById('avatar').value;
-      const bio = document.getElementById('bio').value.trim();
-      const status = document.getElementById('status').value;
-      socket.emit('perfil', {
-        nome: "{{ session['usuario'] }}",
-        avatar,
-        canal: "{{ canal }}",
-        bio,
-        status
-      });
-    }
+            messagesContainer.appendChild(msgDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
 
-    function sendMessage() {
-      const avatar = document.getElementById('avatar').value;
-      const msg = input.value.trim();
-      if (msg !== "") {
-        socket.emit('message', `${avatar} {{ session['usuario'] }}: ${msg}`);
-        input.value = '';
-      }
-    }
+        socket.on('connect', () => {
+            socket.emit('join', { username: username, room: room_id });
+        });
 
-    socket.on('message', function(msg) {
-      const item = document.createElement('li');
-      item.innerHTML = `
-        <div class="msg-box">
-          <span>${msg}</span>
-          <button class="reply-btn" onclick="replyTo('${escapeQuotes(msg)}')">↪ Responder</button>
-        </div>
-      `;
-      document.getElementById('messages').appendChild(item);
-    });
+        socket.on('message', (data) => {
+            displayMessage(data);
+        });
 
-    function replyTo(message) {
-      const name = message.split(':')[0];
-      input.value = `@${name} `;
-      input.focus();
-    }
+        document.getElementById('send-form').onsubmit = (e) => {
+            e.preventDefault();
+            const input = document.getElementById('message-input');
+            const msg = input.value.trim();
+            if (msg) {
+              
+                socket.emit('message', { username: username, msg: msg, room: room_id });
+                input.value = '';
+            }
+        };
 
-    function escapeQuotes(text) {
-      return text.replace(/'/g, "\\'").replace(/"/g, '\\"');
-    }
-  </script>
+        function startPeerConnection(isInitiator) {
+            peerConnection = new RTCPeerConnection(configuration);
+
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    
+                    socket.emit('signal', {
+                        type: 'ice',
+                        candidate: event.candidate,
+                        room: room_id,
+                        sender: username,
+                        target: isInitiator ? 'receiver' : 'initiator' 
+                    });
+                }
+            };
+
+            peerConnection.ontrack = (event) => {
+                const remoteAudio = document.createElement('audio');
+                remoteAudio.autoplay = true;
+                remoteAudio.srcObject = event.streams[0];
+                remoteAudio.id = `remote-audio-${data.sender}`; 
+                document.body.appendChild(remoteAudio); 
+                displayMessage({ msg: `Áudio de ${data.sender} conectado!`, type: 'system' });
+            };
+
+            if (localStream) {
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+            }
+
+            if (isInitiator) {
+                peerConnection.createOffer()
+                    .then(offer => peerConnection.setLocalDescription(offer))
+                    .then(() => {
+                        socket.emit('signal', {
+                            type: 'sdp',
+                            sdp: peerConnection.localDescription,
+                            room: room_id,
+                            sender: username,
+                            target: 'receiver' 
+                        });
+                    });
+            }
+        }
+
+
+        joinVoiceBtn.onclick = async () => {
+            try {
+              
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                
+                voiceStatus.textContent = 'Voz: Conectando...';
+                joinVoiceBtn.classList.add('hidden');
+                leaveVoiceBtn.classList.remove('hidden');
+
+                startPeerConnection(true); 
+                
+                displayMessage({ msg: 'Você entrou na chamada de voz. Conectando outros usuários...', type: 'system' });
+
+            } catch (err) {
+                console.error("Erro ao acessar microfone:", err);
+                voiceStatus.textContent = 'Voz: Falha no Microfone';
+                alert('Não foi possível acessar seu microfone. Verifique as permissões.');
+            }
+        };
+
+        leaveVoiceBtn.onclick = () => {
+          
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            if (peerConnection) {
+                peerConnection.close();
+                peerConnection = null;
+            }
+            
+            
+            document.querySelectorAll('audio[id^="remote-audio-"]').forEach(el => el.remove());
+
+            voiceStatus.textContent = 'Voz: Desconectada';
+            joinVoiceBtn.classList.remove('hidden');
+            leaveVoiceBtn.classList.add('hidden');
+            displayMessage({ msg: 'Você saiu da chamada de voz.', type: 'system' });
+        };
+        
+
+        socket.on('signal', async (data) => {
+            if (data.room !== room_id) return; 
+
+            if (data.type === 'sdp') {
+                if (!peerConnection) {
+                    startPeerConnection(false); 
+                }
+                
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp));
+                
+                if (data.sdp.type === 'offer') {
+                
+                    peerConnection.createAnswer()
+                        .then(answer => peerConnection.setLocalDescription(answer))
+                        .then(() => {
+                            socket.emit('signal', {
+                                type: 'sdp',
+                                sdp: peerConnection.localDescription,
+                                room: room_id,
+                                sender: username,
+                                target: data.sender
+                            });
+                        });
+                }
+            } else if (data.type === 'ice' && data.candidate) {
+              
+                if (peerConnection) {
+                    peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                }
+            }
+        });
+
+    </script>
 </body>
 </html>

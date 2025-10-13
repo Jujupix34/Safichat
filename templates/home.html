@@ -1,20 +1,110 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>SafiChat 💖</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safichat - Sua Comunidade</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Fundo com cores das bandeiras */
+            background: linear-gradient(135deg, #1f2937 0%, #0f172a 100%);
+        }
+        .hero-bg {
+             /* Gradiente de fundo sutil com cores Pan/Bi */
+            background: linear-gradient(135deg, rgba(255, 27, 141, 0.1) 0%, rgba(162, 0, 103, 0.1) 50%, rgba(0, 56, 168, 0.1) 100%);
+            border-bottom: 2px solid #B84E99; /* Cor roxa Bi */
+        }
+    </style>
 </head>
-<body>
-    <h1>Bem-vinda ao SafiChat 🌸</h1>
-    <p>Escolha um canal para começar a conversar:</p>
+<body class="text-gray-100">
 
-    <div class="canal-buttons">
-        <a href="/canal/geral"><button>🌈 Geral</button></a>
-        <a href="/canal/desabafos"><button>💭 Desabafos</button></a>
-        <a href="/canal/arte"><button>🎨 Arte Sáfica</button></a>
-        <a href="/canal/poesias"><button>📚 Poesias</button></a>
-        <a href="/canal/memes"><button>😂 Memes</button></a>
+    <div class="min-h-screen">
+        <!-- Hero Section (Destaque) -->
+        <header class="hero-bg py-16 md:py-24 shadow-xl">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-6xl font-extrabold tracking-tight text-white mb-4">
+                    Safichat
+                </h1>
+                <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+                    Converse, compartilhe e conecte-se em nossa comunidade vibrante. Chat em tempo real e DMs privadas.
+                </p>
+                <div class="mt-8 space-x-4">
+                    <a href="{{ url_for('login') }}" 
+                       class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">
+                        Fazer Login
+                    </a>
+                    <a href="{{ url_for('cadastro') }}" 
+                       class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">
+                        Criar Conta
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+            <!-- Seção de Perfis em Destaque -->
+            <section class="mb-12">
+                <h2 class="text-3xl font-bold text-center text-white mb-8">Novos Perfis na Área</h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {% if perfis_vitrine %}
+                        {% for perfil in perfis_vitrine %}
+                            <div class="bg-gray-800 p-5 rounded-xl shadow-lg border-t-2 border-indigo-500 hover:shadow-2xl transform hover:scale-105 transition duration-300">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-xl font-bold text-white">
+                                        {{ perfil.avatar }}
+                                    </div>
+                                    <div>
+                                        <p class="text-lg font-semibold text-white truncate">{{ perfil.nome }}</p>
+                                        <p class="text-xs text-gray-400">Canal: {{ perfil.canal }}</p>
+                                    </div>
+                                </div>
+                                <p class="mt-3 text-sm text-gray-300 line-clamp-2">"{{ perfil.bio or 'Ainda não adicionou uma bio!' }}"</p>
+                                <span class="inline-block mt-3 text-xs font-medium px-3 py-1 bg-green-900/50 text-green-300 rounded-full">{{ perfil.status or 'Offline' }}</span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="col-span-4 text-center text-gray-400">Nenhum perfil cadastrado ainda. Seja o primeiro!</p>
+                    {% endif %}
+                </div>
+            </section>
+            
+            <hr class="border-gray-700 my-10">
+
+            <!-- Seção de Feed Público de Exemplo -->
+            <section>
+                <h2 class="text-3xl font-bold text-center text-white mb-8">Prévia do Chat Geral</h2>
+
+                <div class="max-w-3xl mx-auto space-y-4">
+                    {% for msg in mensagens_teste %}
+                    <div class="flex items-start space-x-4 p-4 bg-gray-800 rounded-lg shadow-md">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center bg-yellow-500 text-sm font-bold text-white">
+                            {{ msg.user[0] }}
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-baseline space-x-2">
+                                <span class="font-semibold text-indigo-400">{{ msg.user }}</span>
+                                <span class="text-xs text-gray-500">{{ msg.time }}</span>
+                            </div>
+                            <p class="text-white mt-1">{{ msg.text }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="text-center pt-4">
+                         <a href="{{ url_for('login') }}" class="text-lg text-green-400 hover:text-green-500 font-semibold transition duration-150">
+                            Faça login para enviar a sua mensagem!
+                        </a>
+                    </div>
+                </div>
+
+            </section>
+        </main>
     </div>
+
 </body>
 </html>
