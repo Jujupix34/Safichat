@@ -65,9 +65,9 @@ def home():
     
     
     mensagens_teste = [
-        {"usuario": "Joana", "texto": "Amei o novo canal Sapamovies! Alguém já viu 'The L Word'?", "tempo": "1 min atrás"},
-        {"usuario": "Lia", "texto": "Canal Desabafo me ajudou muito hoje. Gratidão a todas.", "tempo": "3 min atrás"},
-        {"usuario": "Marcela", "texto": "Entrem no canal 'Jogos' para uma partida de Among Us!", "tempo": "5 min atrás"},
+        {"nome": "Borboleta", "texto": "Adorei a ideia dos canais temáticos! Vou para o Sapamovies agora mesmo 🍿", "data": "10:15"},
+        {"nome": "Lua", "texto": "Testando a sala geral. Que bom que a navegação está mais fácil. 💚", "data": "10:20"},
+        {"nome": "Girassol", "texto": "Alguém já usou o chat de voz? Quero testar! 🎙️", "data": "10:25"},
     ]
 
     return render_template("home.html", 

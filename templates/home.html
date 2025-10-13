@@ -75,27 +75,27 @@
             
             <hr class="border-gray-700 my-10">
 
-            <!-- Seção de Feed Público de Exemplo -->
+    
             <section>
                 <h2 class="text-3xl font-bold text-center text-white mb-8">Prévia do Chat Geral</h2>
 
                 <div class="max-w-3xl mx-auto space-y-4">
                     {% for msg in mensagens_teste %}
-                    <div class="flex items-start space-x-4 p-4 bg-gray-800 rounded-lg shadow-md">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center bg-yellow-500 text-sm font-bold text-white">
-                            {{ msg.user[0] }}
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-baseline space-x-2">
-                                <span class="font-semibold text-indigo-400">{{ msg.user }}</span>
-                                <span class="text-xs text-gray-500">{{ msg.time }}</span>
-                            </div>
-                            <p class="text-white mt-1">{{ msg.text }}</p>
-                        </div>
-                    </div>
-                    {% endfor %}
+        <div class="flex items-start space-x-3 p-2 bg-gray-700 rounded-lg">
+            <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-pink-500 text-sm font-bold text-white shadow-lg">
+                {{ msg.nome[0] }}
+            </div>
+            <div>
+                <span class="text-pink-400 font-semibold">{{ msg.nome }}</span>
+                <span class="text-gray-400 text-xs ml-2">{{ msg.data }}</span>
+                <p class="text-gray-200 mt-0.5">{{ msg.texto }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 
-                    <div class="text-center pt-4">
+      <div class="text-center pt-4">
                          <a href="{{ url_for('login') }}" class="text-lg text-green-400 hover:text-green-500 font-semibold transition duration-150">
                             Faça login para enviar a sua mensagem!
                         </a>
