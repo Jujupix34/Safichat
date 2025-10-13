@@ -208,22 +208,19 @@ def handle_message(msg):
 @socketio.on('connect')
 def handle_connect():
     nome = session.get("usuario")
-    if nome:
-        
-        send(f'{nome} entrou no chat!', broadcast=True, include_self=False)
-
-
 
 if __name__ == '__main__':
-
+    
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
         
     
     with app.app_context():
-        
+    
         db.create_all()
     
     port = int(os.environ.get("PORT", 10000))
+
+    socketio.run(app, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True) 
     
-    socketio.run(app, host='0.0.0.0', port=port)
+
