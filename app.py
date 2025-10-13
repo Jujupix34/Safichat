@@ -5,13 +5,10 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///safichat.db")
-
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "uma_chave_secreta_para_desenvolvimento") 
+app.secret_key = os.environ.get("SECRET_KEY", "chave_secreta_padrao") 
 
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
-
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  
@@ -21,30 +18,28 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Boa prática para Flask-SQLAlchemy
+db_url = os.environ.get("DATABASE_URL")
+if db_url and db_url.startswith("postgres://"):
+    
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url or 'sqlite:///safichat.db'
 
 db = SQLAlchemy(app)
 socketio = SocketIO(app)
 
 class Perfil(db.Model):
-
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(50), nullable=False)
+    nome = db.Column(db.String(50), nullable=False, unique=False)
     avatar = db.Column(db.String(10), nullable=False)
-    canal = db.Column(db.String(20), nullable=False)
+    canal = db.Column(db.String(20), nullable=False, unique=False)
     bio = db.Column(db.String(200), nullable=True) 
     status = db.Column(db.String(50), nullable=True)
     foto = db.Column(db.String(200), nullable=True)
     senha = db.Column(db.String(200), nullable=False)
-    
-    __table_args__ = (
-        db.UniqueConstraint('nome', 'canal', name='_nome_canal_uc'),
-    )
 
+
+    __table_args__ = (db.UniqueConstraint('nome', 'canal', name='_nome_canal_uc'),)
 
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
@@ -68,7 +63,7 @@ def painel():
     else:
         perfis = Perfil.query.all()
     
-    canais = [c[0] for c in db.session.query(Perfil.canal).distinct().all()]
+    canais = db.session.query(Perfil.canal).distinct().all()
     return render_template("painel.html", perfis=perfis, canais=canais, canal_selecionado=canal)
 
 @app.route("/logout-admin")
@@ -84,8 +79,7 @@ def excluir(id):
     if perfil:
         db.session.delete(perfil)
         db.session.commit()
-    return redirect(url_for("painel", canal=request.args.get("canal")))
-
+    return redirect(url_for("painel"))
 
 @app.route("/cadastro", methods=["GET", "POST"])
 def cadastro():
@@ -98,26 +92,25 @@ def cadastro():
             erro = "Preencha todos os campos."
             return render_template("cadastro.html", erro=erro)
 
+        
         existente = Perfil.query.filter_by(nome=nome, canal=canal).first()
         if existente:
             erro = "Nome já está em uso neste canal."
             return render_template("cadastro.html", erro=erro)
 
         senha_hash = generate_password_hash(senha)
+        novo = Perfil(nome=nome, avatar="🙂", canal=canal, senha=senha_hash)
         
-        
-        novo = Perfil(
-            nome=nome, 
-            avatar="🙂",
-            canal=canal, 
-            senha=senha_hash,
-            bio="Novo usuário SafiChat!", 
-            status="Online",
-            foto=""
-        ) 
-        
-        db.session.add(novo)
-        db.session.commit()
+        try:
+            db.session.add(novo)
+            db.session.commit()
+        except Exception as e:
+            
+            db.session.rollback()
+            print(f"Erro ao cadastrar: {e}")
+            erro = "Ocorreu um erro interno. Tente novamente."
+            return render_template("cadastro.html", erro=erro)
+
 
         session["autenticado"] = True
         session["usuario"] = nome
@@ -160,13 +153,13 @@ def configuracoes():
     nome = session.get("usuario")
     canal = "geral"
     perfil = Perfil.query.filter_by(nome=nome, canal=canal).first()
-    
-    if not perfil:
-    
-        session.clear()
-        return redirect(url_for("login"))
 
     if request.method == "POST":
+        if perfil is None:
+            
+            session.clear()
+            return redirect(url_for("login"))
+            
         if request.form.get("acao") == "excluir":
             db.session.delete(perfil)
             db.session.commit()
@@ -178,49 +171,76 @@ def configuracoes():
 
             file = request.files.get("foto")
             if file and allowed_file(file.filename):
-                try:
-                    filename = secure_filename(file.filename)
-                    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    if not os.path.exists(app.config['UPLOAD_FOLDER']):
-                         os.makedirs(app.config['UPLOAD_FOLDER'])
-                    file.save(path)
-                    perfil.foto = f"/static/uploads/{filename}"
-                except Exception as e:
-                    print(f"Erro ao salvar arquivo: {e}")
+                filename = secure_filename(file.filename)
+                path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    
+                if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                    os.makedirs(app.config['UPLOAD_FOLDER'])
+                file.save(path)
+                perfil.foto = f"/static/uploads/{filename}"
 
             db.session.commit()
         return redirect(url_for("configuracoes"))
 
     return render_template("configuracoes.html", perfil=perfil)
 
-
 @socketio.on('message')
 def handle_message(msg):
+    print(f'Mensagem recebida: {msg}')
+    if "entrou no chat!" in msg:
+        partes = msg.split(" ")
+        avatar = partes[0]
+        nome = partes[1]
+        canal = request.args.get('canal', 'geral')
 
-    nome = session.get("usuario")
-    if nome:
-        
-        send(f'**{nome}:** {msg}', broadcast=True)
-    else:
-        
-        send("Você precisa estar logado para enviar mensagens.", room=request.sid)
+        existente = Perfil.query.filter_by(nome=nome, canal=canal).first()
+        if not existente:
+            
+            novo = Perfil(nome=nome, avatar=avatar, canal=canal, senha="")
+            try:
+                db.session.add(novo)
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                print(f"Erro ao criar perfil no socket: {e}")
 
-@socketio.on('connect')
-def handle_connect():
-    nome = session.get("usuario")
+    send(msg, broadcast=True)
+
+@socketio.on('perfil')
+def salvar_perfil(data):
+    
+    existente = Perfil.query.filter_by(nome=data['nome'], canal=data['canal']).first()
+    if not existente:
+        novo = Perfil(
+            nome=data['nome'],
+            avatar=data['avatar'],
+            canal=data['canal'],
+            bio=data.get('bio', ''),
+            status=data.get('status', ''),
+            foto=data.get('foto', ''),
+            senha=generate_password_hash(data.get('senha', '')) 
+        )
+        try:
+            db.session.add(novo)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Erro ao salvar perfil no socket: {e}")
+
+
+
 
 if __name__ == '__main__':
-    
+
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
         
     
     with app.app_context():
-    
         db.create_all()
     
     port = int(os.environ.get("PORT", 10000))
-
-    socketio.run(app, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True) 
     
+    socketio.run(app, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True) 
+
 
