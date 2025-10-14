@@ -6,51 +6,45 @@
     <title>Configurações - Safichat</title>
     <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
     <style>
+    
+    :root {
+        --cor-principal: #a30262; 
+        --cor-secundaria: #d362a4; 
+        --cor-destaque: #ff9a56;
+        --cor-texto: #fff; 
+        --cor-fundo-card: rgba(255, 255, 255, 0.1); 
+    }
+
+    body {
         
-        :root {
-            --cor-principal: #a30262; 
-            --cor-secundaria: #d362a4; 
-            --cor-destaque: #ff9a56; 
-            --cor-texto: #fff;
-            --cor-fundo-card: rgba(255, 255, 255, 0.1);
-        }
+        background-color: #1a1a1a; 
+        font-family: 'Inter', sans-serif;
+        color: var(--cor-texto);
+        min-height: 100vh;
+    }
 
-        body {
-            
-            background: linear-gradient(135deg, #d52d00, #ff9a56, #ffffff, #d362a4, #a30262);
-            background-size: 400% 400%;
-            animation: gradientAnim 15s ease infinite; 
-            font-family: 'Inter', sans-serif; 
-            color: var(--cor-texto); 
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        @keyframes gradientAnim {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        
-        .glass-card {
-            background: var(--cor-fundo-card);
-            backdrop-filter: blur(10px); 
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 2rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
-
-        
-        .input-glass {
-            background-color: rgba(255, 255, 255, 0.15); 
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: var(--cor-texto);
-        }
-    </style>
+    
+    .glass-card {
+        background: var(--cor-fundo-card);
+        backdrop-filter: blur(10px); 
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: var(--cor-texto);
+    }
+    
+    
+    .input-glass {
+        background-color: rgba(194, 46, 157, 0.15); 
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: var(--cor-texto);
+    }
+    
+    .btn-primary {
+        background-color: var(--cor-principal);
+    }
+</style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-2xl bg-gray-900 shadow-2xl rounded-xl p-8 border border-purple-600/50">

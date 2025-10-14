@@ -1,13 +1,23 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_socketio import SocketIO, send, join_room
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-import os
+import os 
 import random
-from sqlalchemy import desc
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET")
+)
+
 
 app = Flask(__name__)
+
 
 app.secret_key = os.environ.get("SECRET_KEY", "uma_chave_secreta_padrao")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "senha_admin_padrao")
@@ -193,45 +203,49 @@ def configuracoes():
         return redirect(url_for("login"))
 
     nome = session.get("usuario")
-    perfil = Perfil.query.filter_by(nome=nome).first()
+    canal = "geral" 
+    
+    try:
+        perfil = db.session.execute(
+            db.select(Perfil).filter_by(nome=nome, canal=canal)
+        ).scalars().first()
+    except Exception as e:
+        print(f"Erro de banco de dados ao buscar perfil em configurações: {e}")
+        return redirect(url_for("home")) 
 
     if not perfil:
+        
         session.clear()
         return redirect(url_for("login"))
 
     if request.method == "POST":
-        acao = request.form.get("acao")
-        
-        if acao == "excluir":
-        
+        if request.form.get("acao") == "excluir":
+            
             db.session.delete(perfil)
             db.session.commit()
             session.clear()
             return redirect(url_for("login"))
-        
-        elif acao == "atualizar":
+        else:
         
             perfil.bio = request.form.get("bio")
             perfil.status = request.form.get("status")
 
             file = request.files.get("foto")
-            if file and allowed_file(file.filename):
-        
-                if not os.path.exists(app.config['UPLOAD_FOLDER']):
-                    os.makedirs(app.config['UPLOAD_FOLDER'])
+            if file and file.filename and allowed_file(file.filename):
+                try:
                     
-                filename = secure_filename(file.filename)
-                
-                path = os.path.join(app.config['UPLOAD_FOLDER'], f"{perfil.id}_{filename}")
-                file.save(path)
-                perfil.foto = f"/static/uploads/{perfil.id}_{filename}"
-            
+                    upload_result = cloudinary.uploader.upload(file, folder="safichat_avatars")
+                    perfil.foto = upload_result['secure_url']
+                    
+                except Exception as e:
+                    print(f"Erro no upload para Cloudinary: {e}")
+                    
+                    pass 
+
             db.session.commit()
             return redirect(url_for("configuracoes"))
 
     return render_template("configuracoes.html", perfil=perfil)
-
-
 
 
 @app.route("/admin", methods=["GET", "POST"])

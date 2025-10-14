@@ -8,15 +8,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            /* Fundo com cores das bandeiras */
-            background: linear-gradient(135deg, #1f2937 0%, #0f172a 100%);
+            background: linear-gradient(135deg, #d52d00, #ff9a56, #ffffff, #d362a4, #a30262);
+            background-size: 400% 400%;
+            animation: gradientAnim 15s ease infinite; 
+            font-family: 'Inter', sans-serif; 
+            color: var(--cor-texto); 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        .hero-bg {
-             /* Gradiente de fundo sutil com cores Pan/Bi */
-            background: linear-gradient(135deg, rgba(255, 27, 141, 0.1) 0%, rgba(162, 0, 103, 0.1) 50%, rgba(0, 56, 168, 0.1) 100%);
-            border-bottom: 2px solid #B84E99; /* Cor roxa Bi */
+
+        @keyframes gradientAnim {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
+
     </style>
 </head>
 <body class="text-gray-100">
