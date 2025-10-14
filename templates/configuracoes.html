@@ -4,83 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configurações - Safichat</title>
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-    
-    :root {
-        --cor-principal: #a30262; 
-        --cor-secundaria: #d362a4; 
-        --cor-destaque: #ff9a56;
-        --cor-texto: #fff; 
-        --cor-fundo-card: rgba(255, 255, 255, 0.1); 
-    }
-
-    body {
         
-        background-color: #1a1a1a; 
-        font-family: 'Inter', sans-serif;
-        color: var(--cor-texto);
-        min-height: 100vh;
-    }
+        :root {
+            --cor-principal: #a30262; 
+            --cor-secundaria: #d362a4; 
+            --cor-destaque: #ff9a56; 
+            --cor-texto: #fff; 
+            --cor-fundo-card: rgba(255, 255, 255, 0.1); 
+        }
 
+        body {
+            
+            background-color: #1a1a1a; 
+            font-family: 'Inter', sans-serif;
+            color: var(--cor-texto);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        
+        .glass-card {
+            background: var(--cor-fundo-card);
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: var(--cor-texto);
+        }
+
+        
+        .input-glass {
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--cor-texto);
+        }
+    </style>
     
-    .glass-card {
-        background: var(--cor-fundo-card);
-        backdrop-filter: blur(10px); 
-        -webkit-backdrop-filter: blur(10px);
-        border-radius: 15px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        color: var(--cor-texto);
-    }
-    
-    
-    .input-glass {
-        background-color: rgba(194, 46, 157, 0.15); 
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: var(--cor-texto);
-    }
-    
-    .btn-primary {
-        background-color: var(--cor-principal);
-    }
-</style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-2xl bg-gray-900 shadow-2xl rounded-xl p-8 border border-purple-600/50">
-        <h1 class="text-3xl font-bold text-center mb-6 text-white tracking-wider">
-            <span class="text-pink-400">Suas</span> Configurações
+<body class="p-4">
+    <div class="w-full max-w-2xl glass-card">
+        <h1 class="text-3xl font-bold text-center mb-6 tracking-wider" style="color: var(--cor-principal);">
+            Suas Configurações
         </h1>
-        <p class="text-center text-gray-400 mb-8">
+        <p class="text-center text-gray-200 mb-8" style="color: var(--cor-secundaria);">
             Gerencie seu perfil, edite sua bio e altere sua foto.
         </p>
 
         <form method="POST" enctype="multipart/form-data" class="space-y-6">
             <input type="hidden" name="acao" value="salvar">
             
-          
-            <div class="flex items-center space-x-4 p-4 bg-gray-800 rounded-lg border border-gray-700/50">
-                <div class="text-4xl rounded-full p-2 bg-pink-500/30 text-white">
+    
+            <div class="flex items-center space-x-4 p-4 rounded-lg border border-gray-700/50" style="background-color: rgba(0, 0, 0, 0.2);">
+                <div class="text-4xl rounded-full p-2" style="background-color: var(--cor-principal); color: var(--cor-texto);">
                     {{ perfil.avatar or '👤' }}
                 </div>
                 <div class="flex-grow">
-                    <p class="text-xl font-semibold text-white">{{ perfil.nome }}</p>
-                    <p class="text-sm text-pink-400">Canal: {{ perfil.canal }}</p>
+                    <p class="text-xl font-semibold">{{ perfil.nome }}</p>
+                    <p class="text-sm" style="color: var(--cor-destaque);">Canal: {{ perfil.canal }}</p>
                 </div>
             </div>
 
             
             <div>
-                <label for="bio" class="block text-sm font-medium text-gray-300 mb-2">Bio (Sobre Você)</label>
-                <textarea id="bio" name="bio" rows="3" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-pink-500 focus:border-pink-500" placeholder="Escreva uma frase que te define ou seus interesses...">{{ perfil.bio or '' }}</textarea>
+                <label for="bio" class="block text-sm font-medium mb-2" style="color: var(--cor-secundaria);">Bio (Sobre Você)</label>
+                <textarea id="bio" name="bio" rows="3" class="w-full px-4 py-2 rounded-lg focus:ring-4 focus:ring-opacity-50 input-glass focus:ring-[var(--cor-destaque)]" placeholder="Escreva uma frase que te define ou seus interesses...">{{ perfil.bio or '' }}</textarea>
             </div>
 
-          
-            <div>
-                <label for="status" class="block text-sm font-medium text-gray-300 mb-2">Status (O que você está fazendo?)</label>
-                <input type="text" id="status" name="status" value="{{ perfil.status or '' }}" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-pink-500 focus:border-pink-500" placeholder="Ex: 'Procurando um Sapamovies!'">
-            </div>
             
+            <div>
+                <label for="status" class="block text-sm font-medium mb-2" style="color: var(--cor-secundaria);">Status (O que você está fazendo?)</label>
+                <input type="text" id="status" name="status" value="{{ perfil.status or '' }}" class="w-full px-4 py-2 rounded-lg input-glass focus:ring-4 focus:ring-opacity-50 focus:ring-[var(--cor-destaque)]" placeholder="Ex: 'Procurando um Sapamovies!'">
+            </div>
+        
             <div class="pt-4 border-t border-gray-700">
                 <label for="foto" class="block text-sm font-medium text-gray-300 mb-2">Alterar Foto de Perfil</label>
                 <input type="file" id="foto" name="foto" accept="image/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-500/20 file:text-pink-400 hover:file:bg-pink-500/30">
@@ -88,16 +89,36 @@
                     <p class="text-xs text-gray-500 mt-2">Foto atual: <a href="{{ perfil.foto }}" target="_blank" class="text-pink-400 hover:underline">visualizar</a></p>
                 {% endif %}
             </div>
+            
+            
+            <div class="pt-4 border-t border-gray-700 space-y-3">
+                <h3 class="text-lg font-semibold" style="color: var(--cor-destaque);">Status de Apoiadora</h3>
 
+                {% if perfil.is_supporter %}
+                    <p class="text-sm text-green-400 font-medium">✨ Você é uma Apoiadora! 🎉</p>
+
+                    <div class="flex items-center space-x-3 p-3 rounded-lg" style="background-color: rgba(0, 0, 0, 0.2);">
+                        <input type="checkbox" id="candidata_aba" name="candidata_aba" {% if perfil.candidata_aba %}checked{% endif %} class="h-5 w-5 rounded focus:ring-[var(--cor-principal)] text-[var(--cor-principal)] border-gray-300">
+                        <label for="candidata_aba" class="text-sm font-medium text-gray-200">
+                            Permitir aparecer na aba pública de Apoiadoras
+                        </label>
+                    </div>
+
+                {% else %}
+                    <div class="p-3 rounded-lg border border-gray-600">
+                         <p class="text-sm text-gray-400">Para aparecer na Aba de Apoiadoras, primeiro você precisa fazer uma doação. <a href="{{ url_for('apoie') }}" class="font-bold hover:underline" style="color: var(--cor-destaque);">Clique aqui para Apoiar.</a></p>
+                    </div>
+                {% endif %}
+            </div>
             
             <div>
-                <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-lg shadow-pink-600/30 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                <button type="submit" class="w-full text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-lg shadow-pink-600/30 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-gray-900" style="background-color: var(--cor-principal);">
                     <i class="fas fa-save mr-2"></i> Salvar Alterações
                 </button>
             </div>
         </form>
 
-      
+        
         <div class="mt-8 pt-6 border-t border-gray-700/50">
             <h2 class="text-lg font-semibold text-red-400 mb-3">Zona de Perigo</h2>
             <p class="text-sm text-gray-400 mb-4">Excluir sua conta é permanente e não pode ser desfeito. Todos os seus dados serão apagados.</p>

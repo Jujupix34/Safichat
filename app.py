@@ -57,8 +57,15 @@ class Perfil(db.Model):
     canal = db.Column(db.String(20), nullable=False)
     bio = db.Column(db.String(200), nullable=True)
     status = db.Column(db.String(50), nullable=True)
-    foto = db.Column(db.String(200), nullable=True)
+    foto = db.Column(db.String(500), nullable=True) 
     senha = db.Column(db.String(200), nullable=False)
+    
+    
+    is_premium = db.Column(db.Boolean, default=False)
+    moedas = db.Column(db.Integer, default=100) 
+    
+    is_supporter = db.Column(db.Boolean, default=False)
+    candidata_aba = db.Column(db.Boolean, default=False)
 
 def get_dm_room_name(user1, user2):
     
@@ -151,26 +158,32 @@ def mostrar_perfis():
                            usuario_atual=usuario_atual,
                            canais=LISTA_CANAIS)
 
-@app.route("/canal/<nome_canal>")
-def canal(nome_canal):
+@app.route("/canal/<nome>")
+def canal(nome):
+    
     if not session.get("autenticado"):
         return redirect(url_for("login"))
+
+    
+    SALAS_PREMIUM = ['amor', 'cinema', 'musica']
+
+    if nome in SALAS_PREMIUM:
         
-    if nome_canal not in LISTA_CANAIS:
-        return redirect(url_for("mostrar_perfis"))
+        try:
+            perfil = db.session.execute(
+                db.select(Perfil).filter_by(nome=session.get('usuario'), canal='geral')
+            ).scalars().first()
+        except Exception as e:
+            print(f"Erro ao buscar perfil para Gate Premium: {e}")
+            return redirect(url_for('home')) 
 
+        
+        if not perfil or not perfil.is_premium:
+            
+            return redirect(url_for('apoie')) 
 
-    room_name = nome_canal
     
-    
-    perfil = Perfil.query.filter_by(nome=session.get("usuario")).first()
-    avatar = perfil.avatar if perfil else "❓"
-
-    return render_template("chat.html", 
-                           canal_nome=nome_canal, 
-                           room_id=room_name,
-                           canais=LISTA_CANAIS,
-                           usuario_avatar=avatar)
+    return render_template("chat.html", canal=nome, LISTA_CANAIS=LISTA_CANAIS)
 
 @app.route("/dm/<nome_alvo>")
 def dm(nome_alvo):
@@ -342,10 +355,39 @@ if __name__ == '__main__':
 
     with app.app_context():
         db.create_all()
-    
+
+
+
+    with app.app_context():
+        db.create_all()
+        
+        
+        try:
+            from sqlalchemy.exc import ProgrammingError
+            
+            usuarios_sem_moeda = db.session.execute(
+                db.select(Perfil).filter(Perfil.moedas.is_(None))
+            ).scalars().all()
+
+            if usuarios_sem_moeda:
+                print(f"MIGRAÇÃO: Inicializando 100 moedas para {len(usuarios_sem_moeda)} perfis antigos.")
+                for perfil in usuarios_sem_moeda:
+                    perfil.moedas = 100
+                db.session.commit()
+        except ProgrammingError as e:
+            #
+            print("MIGRAÇÃO: Coluna 'moedas' ainda não existe no DB. Próximo deploy deve inicializar.")
+            db.session.rollback()
+        except Exception as e:
+             
+            print(f"MIGRAÇÃO: Erro geral durante a inicialização de moedas: {e}")
+            db.session.rollback()
+        
     
     port = int(os.environ.get("PORT", 10000))
     
     socketio.run(app, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True) 
+
+    
 
 

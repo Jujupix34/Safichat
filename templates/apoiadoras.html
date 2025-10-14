@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apoiadoras - Safichat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        
+        :root {
+            --cor-principal: #a30262; 
+            --cor-secundaria: #d362a4; 
+            --cor-destaque: #ff9a56; 
+            --cor-texto: #fff; 
+            --cor-fundo-card: rgba(255, 255, 255, 0.1); 
+        }
+
+        body {
+            background-color: #1a1a1a; 
+            font-family: 'Inter', sans-serif;
+            color: var(--cor-texto);
+            min-height: 100vh;
+        }
+
+        
+        .glass-card {
+            background: var(--cor-fundo-card);
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: var(--cor-texto);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    
+    <div class="max-w-4xl mx-auto py-8">
+        <header class="text-center mb-10">
+            <a href="{{ url_for('home') }}" class="text-lg mb-2 inline-block hover:text-[var(--cor-destaque)] transition duration-200" style="color: var(--cor-secundaria);">&larr; Voltar para o Início</a>
+            <h1 class="text-4xl font-extrabold tracking-wider mb-2" style="color: var(--cor-principal);">Comunidade de Apoiadoras</h1>
+            <p class="text-xl text-gray-300">Graças ao apoio, o Safichat continua online e vibrando.</p>
+        </header>
+
+        
+        {% if session.get('autenticado') %}
+        <div class="glass-card p-4 mb-8 text-center border-2 border-dashed border-green-500/50">
+            <p class="text-lg font-semibold mb-2">Quer aparecer aqui?</p>
+            <p class="text-sm text-gray-300">Visite as <a href="{{ url_for('configuracoes') }}" class="font-bold hover:underline" style="color: var(--cor-destaque);">Configurações</a> para se tornar uma Apoiadora e permitir sua exibição nesta lista! ⭐</p>
+        </div>
+        {% endif %}
+
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {% if apoiadoras %}
+                {% for perfil in apoiadoras %}
+                <div class="glass-card p-5 text-center transition transform hover:scale-[1.03] duration-300" style="border-left: 5px solid var(--cor-destaque);">
+                    
+                
+                    <div class="mb-4">
+                        {% if perfil.foto %}
+                            <img src="{{ perfil.foto }}" alt="Foto de {{ perfil.nome }}" class="w-20 h-20 rounded-full mx-auto object-cover border-4" style="border-color: var(--cor-principal);">
+                        {% else %}
+                            <div class="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl border-4" style="background-color: var(--cor-secundaria); border-color: var(--cor-principal);">
+                                {{ perfil.avatar or '❤️' }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <h2 class="text-xl font-bold mb-1" style="color: var(--cor-texto);">{{ perfil.nome }}</h2>
+                    <p class="text-sm mb-3" style="color: var(--cor-destaque);">Membro Apoiadora</p>
+                    <p class="text-sm text-gray-400 italic truncate">{{ perfil.bio or 'Nenhuma bio definida.' }}</p>
+
+                    <a href="{{ url_for('dm_start', nome_alvo=perfil.nome) }}" class="mt-4 inline-block px-4 py-2 rounded-full text-sm font-semibold transition duration-200 hover:opacity-90" style="background-color: var(--cor-destaque); color: #1a1a1a;">
+                        Mandar Mensagem
+                    </a>
+                </div>
+                {% endfor %}
+            {% else %}
+                
+                <div class="col-span-full p-10 text-center glass-card">
+                    <p class="text-xl font-semibold mb-4" style="color: var(--cor-secundaria);">Ainda não temos apoiadoras públicas.</p>
+                    <p class="text-gray-400">Seja a primeira a aparecer aqui e ajude o site a crescer! Visite a página de Apoio.</p>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apoie o Safichat - Premium & Doações</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        
+        :root {
+            --cor-principal: #a30262; 
+            --cor-secundaria: #d362a4;
+            --cor-destaque: #ff9a56; 
+            --cor-texto: #fff; 
+            --cor-fundo-card: rgba(255, 255, 255, 0.1); 
+        }
+
+        body {
+            background-color: #1a1a1a; 
+            font-family: 'Inter', sans-serif;
+            color: var(--cor-texto);
+            min-height: 100vh;
+        }
+
+    
+        .glass-card {
+            background: var(--cor-fundo-card);
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: var(--cor-texto);
+        }
+
+        .btn-premium {
+            background-color: var(--cor-principal);
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .btn-premium:hover {
+            background-color: #8f0257; 
+            transform: translateY(-2px);
+        }
+
+        .btn-support {
+            background-color: var(--cor-destaque);
+            color: #1a1a1a;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .btn-support:hover {
+            background-color: #e58742; 
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div class="max-w-5xl mx-auto py-8">
+        <header class="text-center mb-12">
+            <a href="{{ url_for('home') }}" class="text-lg mb-2 inline-block hover:text-[var(--cor-destaque)] transition duration-200" style="color: var(--cor-secundaria);">&larr; Voltar para a Home</a>
+            <h1 class="text-4xl font-extrabold tracking-wider mb-2" style="color: var(--cor-destaque);">Apoie o Futuro do Safichat</h1>
+            <p class="text-xl text-gray-300">Escolha como você quer ajudar: Assinatura Premium ou Doação Avulsa!</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            
+            <div class="lg:col-span-2 glass-card p-6 border-2 border-[var(--cor-principal)]">
+                <h2 class="text-3xl font-bold mb-4" style="color: var(--cor-principal);">Plano Premium: R$ 9,90 / Mês</h2>
+                <p class="text-gray-300 mb-6">Assine o Premium e tenha acesso completo a salas exclusivas, sem anúncios e com total liberdade de expressão.</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    <div class="p-3 rounded-lg" style="background-color: rgba(255, 255, 255, 0.05);">
+                        <p class="font-semibold" style="color: var(--cor-destaque);">⭐ Acesso Ilimitado</p>
+                        <p class="text-sm text-gray-400">Salas exclusivas: Amor, Cinema e Música.</p>
+                    </div>
+                    <div class="p-3 rounded-lg" style="background-color: rgba(255, 255, 255, 0.05);">
+                        <p class="font-semibold" style="color: var(--cor-destaque);">🎙️ Voz e Mídia Liberadas</p>
+                        <p class="text-sm text-gray-400">Microfone ilimitado e envio de mais mídias.</p>
+                    </div>
+                    <div class="p-3 rounded-lg" style="background-color: rgba(255, 255, 255, 0.05);">
+                        <p class="font-semibold" style="color: var(--cor-destaque);">🚫 Sem Anúncios</p>
+                        <p class="text-sm text-gray-400">Navegue e converse sem interrupções.</p>
+                    </div>
+                    <div class="p-3 rounded-lg" style="background-color: rgba(255, 255, 255, 0.05);">
+                        <p class="font-semibold" style="color: var(--cor-destaque);">👑 Selo Premium e Prioridade</p>
+                        <p class="text-sm text-gray-400">Selo exclusivo no perfil e prioridade de acesso.</p>
+                    </div>
+                </div>
+
+            
+                <a href="#" class="btn-premium text-white font-bold py-3 px-6 rounded-lg text-center inline-block w-full">
+                    Assinar Agora (R$ 9,90/mês)
+                </a>
+                <p class="text-xs text-center text-gray-500 mt-2">Nenhuma cobrança será feita, link para simulação de pagamento.</p>
+            </div>
+
+            
+            <div class="glass-card p-6 border-2 border-[var(--cor-destaque)]/50">
+                <h2 class="text-3xl font-bold mb-4" style="color: var(--cor-destaque);">Doação Avulsa</h2>
+                <p class="text-gray-300 mb-6">Apoie o site com **qualquer valor** sem compromisso. Seu suporte ajuda a pagar a infraestrutura!</p>
+
+                <div class="mb-6 p-4 rounded-lg" style="background-color: rgba(255, 255, 255, 0.05);">
+                    <p class="font-semibold text-lg mb-1">Status de Apoiadora</p>
+                    <p class="text-sm text-gray-400">Ao doar, você ganha o status de **"Apoiadora"** e pode optar por aparecer na nossa aba pública de gratidão: <a href="{{ url_for('apoiadoras') }}" class="font-bold hover:underline" style="color: var(--cor-secundaria);">Ver Apoiadoras</a>.</p>
+                </div>
+                
+                
+                <a href="#" class="btn-support text-white font-bold py-3 px-6 rounded-lg text-center inline-block w-full mb-3">
+                    Contribuir com Doação
+                </a>
+                <p class="text-xs text-center text-gray-500">Link para plataformas de pagamento como PicPay ou PayPal.</p>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
