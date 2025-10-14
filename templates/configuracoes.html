@@ -6,10 +6,50 @@
     <title>Configurações - Safichat</title>
     <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
     <style>
-        @import url('[https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap)');
-        body { font-family: 'Inter', sans-serif; background-color: #000; }
         
-        .bg-lgbtq { background-image: linear-gradient(to right top, #FF77A9, #FFB8D2, #FFC0CB, #F6D6D9, #F6C8A6, #E0A68A); }
+        :root {
+            --cor-principal: #a30262; 
+            --cor-secundaria: #d362a4; 
+            --cor-destaque: #ff9a56; 
+            --cor-texto: #fff;
+            --cor-fundo-card: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            
+            background: linear-gradient(135deg, #d52d00, #ff9a56, #ffffff, #d362a4, #a30262);
+            background-size: 400% 400%;
+            animation: gradientAnim 15s ease infinite; 
+            font-family: 'Inter', sans-serif; 
+            color: var(--cor-texto); 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes gradientAnim {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        
+        .glass-card {
+            background: var(--cor-fundo-card);
+            backdrop-filter: blur(10px); 
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        
+        .input-glass {
+            background-color: rgba(255, 255, 255, 0.15); 
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--cor-texto);
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">

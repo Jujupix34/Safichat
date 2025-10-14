@@ -8,14 +8,66 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #1f2937; }
-      
-        #messages { max-height: calc(100vh - 160px); } 
-        .bg-chat-header { background-color: #111827; }
-        .bg-chat-input { background-color: #374151; }
-        .text-system { color: #84cc16; }
-        .sidebar-link.active { border-left: 4px solid #EC4899; background-color: #374151; }
-    </style>
+    :root {
+        --cor-principal: #a30262; 
+        --cor-secundaria: #d362a4; 
+        --cor-destaque: #ff9a56; 
+        --cor-texto: #fff;
+        --cor-fundo-card: rgba(255, 255, 255, 0.1); 
+    }
+
+    .body {
+        
+        background: linear-gradient(135deg, #d52d00, #ff9a56, #ffffff, #d362a4, #a30262);
+        background-size: 400% 400%;
+        animation: gradientAnim 15s ease infinite; 
+        font-family: 'Inter', sans-serif;
+        color: var(--cor-texto);
+        min-height: 100vh;
+    }
+
+    @keyframes gradientAnim {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    
+    .glass-card {
+        background: var(--cor-fundo-card);
+        backdrop-filter: blur(10px); 
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    
+    
+    .chat-area-background {
+        background-color: rgba(0, 0, 0, 0.4); 
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+
+    
+    .input-message-area {
+        background-color: rgba(255, 255, 255, 0.15);
+        border: none;
+        color: var(--cor-texto);
+    }
+
+    
+    .link-active {
+        background-color: var(--cor-principal);
+        color: var(--cor-texto);
+    }
+
+
+    .voice-btn {
+        background-color: var(--cor-destaque);
+        color: #1a1a1a; 
+    }
+</style>
 </head>
 <body>
     <div class="flex h-screen overflow-hidden">
